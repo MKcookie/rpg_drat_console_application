@@ -1,3 +1,4 @@
+import 'dart:math';
 
 class Character {
   String _name = 'new character';
@@ -11,9 +12,7 @@ class Character {
   int _magic_defend = 0;
   int _crirate = 0;
   int _cridamage = 0;
-  Character _target;
-
-  Character();
+  var _target;
 
   String get name => _name;
   set name(String name) {
@@ -77,6 +76,7 @@ class Character {
   void targetLock(Character target) {
     _target = target;
   }
+  String get detail_target => '${_target.name}==> Level: ${_target.level}, Hp: ${_target.hp}, Mana: ${_target.mana}, Energy: ${_target.energy}, PAtk: ${_target.physical_attack}, MAtk: ${_target.magic_attack}, PDef: ${_target.physical_defend}, MDef: ${_target.magic_defend}, Crirate: ${_target.crirate}%, Cridamage: ${_target.cridamage}%';
 
   void initCharacter(String name, int level, int hp, int mana, int energy, int atkphy, int atkmag, int phydef, int magdef, int crirte, int cridam) {
     this.name = name;
@@ -92,8 +92,19 @@ class Character {
     criDamageUp(cridam);
   }
 
-  void takeDamage(Character enemy) {
-    
+  void takeDamage() {
+    var damage = 0;
+    var cri = Random();
+    var damage_phy = target.physical_attack - physical_defend;
+    var damage_mag = target.magic_attack - magic_defend;
+
+    if (damage_phy < 0) damage_phy = 0;
+    if (damage_mag < 0) damage_mag = 0;
+
+    damage += damage_phy + damage_mag;
+    if (cri.nextInt(100) <= target.crirate) damage += ((damage * target.cridamage)/100).floor();
+    print(damage);
+    hp -= damage;
   }
 
   String normalAttack() {
@@ -118,6 +129,7 @@ class Character {
     str += '||==> Magic Defend: $magic_defend\n';
     str += '||==> Crirate: $crirate\n';
     str += '||==> Cridamage: $cridamage\n';
+    str += '||==> Target: $detail_target\n';
     return str;
   }
 } 
@@ -145,7 +157,10 @@ class MonsterRock extends Character {}
 
 void main() {
   var boby = Character();
-  boby.initCharacter('Boby', 10, 1000, 10, 10, 55, 10, 35, 20, 30, 50);
+  var dody = Character();
+  dody.initCharacter('Dody', 100, 10000, 100, 300, 1100, 1200, 400, 100, 40, 50);
+  boby.initCharacter('Boby', 100, 100000, 100, 260, 555, 210, 380, 150, 40, 50);
+  boby.targetLock(dody);
+  boby.takeDamage();
   print(boby);
-  print(Warrior());
 }
